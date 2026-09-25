@@ -17,6 +17,7 @@ class FPS_COURSE_API UCombatComponent : public UActorComponent
 public:
 	UCombatComponent();
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	// Cycle to the next weapon
 	void Initiate_CycleWeapon();
@@ -29,13 +30,23 @@ public:
 	UPROPERTY(EditAnywhere, Category="FPS|Weapons")
 	TObjectPtr<UWeaponData> WeaponData;
 	
+	void EquipWeapon(AWeapon* Weapon);
 	void SpawnInventory();
 	void DestroyInventory();
 protected:
 	
 private:
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_CurrentWeapon)
+	TObjectPtr<AWeapon> CurrentWeapon;
+	
+	UFUNCTION()
+	void OnRep_CurrentWeapon(AWeapon* LastWeapon);
+	
+	UPROPERTY(Transient, Replicated)
+	TArray<AWeapon*> Inventory;
+	
 	UPROPERTY(EditDefaultsOnly, Category="FPS|Weapons")
-	TSubclassOf<AWeapon> DefaultWeaponClass;
+	TArray<TSubclassOf<AWeapon>> DefaultWeaponClasses;
 	
 	AWeapon* SpawnWeapon(TSubclassOf<AWeapon> WeaponClass) const;
 };

@@ -47,7 +47,16 @@ AShooterCharacter::AShooterCharacter()
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AShooterCharacter::BeginDestroy()
+{
+	Super::BeginDestroy();
 	
+	if (IsValid(CombatComponent))
+	{
+		CombatComponent->DestroyInventory();	
+	}
 }
 
 void AShooterCharacter::PossessedBy(AController* NewController)

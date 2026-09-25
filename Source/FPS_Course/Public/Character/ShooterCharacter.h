@@ -23,6 +23,8 @@ public:
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
+	
 	virtual void PossessedBy(AController* NewController) override;
 	/** Player Interface */
 	virtual FName GetWeaponAttachPoint_Implementation(const FGameplayTag& WeaponTag) override;

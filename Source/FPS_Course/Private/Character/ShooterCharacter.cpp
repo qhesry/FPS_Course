@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Combat/CombatComponent.h"
+#include "Data/WeaponData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -49,11 +50,31 @@ void AShooterCharacter::BeginPlay()
 	
 }
 
-void AShooterCharacter::Tick(float DeltaTime)
+void AShooterCharacter::PossessedBy(AController* NewController)
 {
-	Super::Tick(DeltaTime);
+	Super::PossessedBy(NewController);
+	
+	if (IsValid(CombatComponent))
+	{
+		CombatComponent->SpawnInventory();
+	}
 }
 
+FName AShooterCharacter::GetWeaponAttachPoint_Implementation(const FGameplayTag& WeaponTag)
+{
+	checkf(CombatComponent->WeaponData, TEXT("CombatComponent->WeaponData is nullptr. Please fill out BP_ShooterCharacter"));
+	return CombatComponent->WeaponData->GripPoints.FindChecked(WeaponTag);
+}
+
+USkeletalMeshComponent* AShooterCharacter::GetMesh1P_Implementation() const
+{
+	return Mesh1P;
+}
+
+USkeletalMeshComponent* AShooterCharacter::GetMesh3P_Implementation() const
+{
+	return GetMesh();
+}
 
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

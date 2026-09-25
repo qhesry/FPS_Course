@@ -4,23 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/PlayerInterface.h"
 #include "ShooterCharacter.generated.h"
 
+struct FGameplayTag;
 class UInputAction;
 class UCombatComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
 UCLASS()
-class FPS_COURSE_API AShooterCharacter : public ACharacter
+class FPS_COURSE_API AShooterCharacter : public ACharacter, public IPlayerInterface
 {
 	GENERATED_BODY()
 
 public:
 	AShooterCharacter();
-	virtual void Tick(float DeltaTime) override;
+	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
+	/** Player Interface */
+	virtual FName GetWeaponAttachPoint_Implementation(const FGameplayTag& WeaponTag) override;
+	virtual USkeletalMeshComponent* GetMesh1P_Implementation() const override;
+	virtual USkeletalMeshComponent* GetMesh3P_Implementation() const override;
+	/** ~Player Interface */
+	
 
 private:
 	

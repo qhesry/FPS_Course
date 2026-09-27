@@ -21,9 +21,11 @@ public:
 	
 	void AttachToOwningPawn() const;
 	
-protected:
 	UPROPERTY(EditAnywhere, Category="FPS|WeaponType")
 	FGameplayTag WeaponType;
+	
+protected:
+	
 	
 private:
 	UPROPERTY(VisibleAnywhere)

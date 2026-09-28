@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="FPS|WeaponType")
 	FGameplayTag WeaponType;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Aiming")
+	float AimFOV;
+	
 protected:
 	
 	

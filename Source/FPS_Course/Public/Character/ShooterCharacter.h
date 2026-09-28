@@ -35,9 +35,17 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
 	TObjectPtr<UCombatComponent> CombatComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Camera")
+	TObjectPtr<UCameraComponent> FirstPersonCamera;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Camera")
+	float DefaultFOV;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAim(bool bIsAiming);
 
 private:
-	
 	void Input_CycleWeapon();
 	void Input_ReloadWeapon();
 	void Input_FireWeapon_Pressed();
@@ -51,9 +59,6 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> FirstPersonCamera;
 	
 	UPROPERTY(EditAnywhere, Category = "FPS|Input")
 	TObjectPtr<UInputAction> CycleWeaponAction;

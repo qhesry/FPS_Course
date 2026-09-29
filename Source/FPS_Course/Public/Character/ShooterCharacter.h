@@ -32,6 +32,9 @@ public:
 	virtual USkeletalMeshComponent* GetMesh3P_Implementation() const override;
 	/** ~Player Interface */
 	
+	UFUNCTION(BlueprintCallable)
+	FRotator GetFixedAimRotation() const;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
 	TObjectPtr<UCombatComponent> CombatComponent;

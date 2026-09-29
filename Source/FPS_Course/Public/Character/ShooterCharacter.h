@@ -24,6 +24,7 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	virtual void PossessedBy(AController* NewController) override;
 	/** Player Interface */
@@ -34,6 +35,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FRotator GetFixedAimRotation() const;
+	
+	UPROPERTY(BlueprintReadOnly, Category="FPS|FABRIK")
+	FTransform FABRIK_SocketTransform;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
@@ -56,6 +60,8 @@ private:
 	void Input_AimWeapon_Pressed();
 	void Input_AimWeapon_Released();
 	
+	void CalculateFABRIKSocketTransform();
+
 	// 1st person view (arms)
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh1P;

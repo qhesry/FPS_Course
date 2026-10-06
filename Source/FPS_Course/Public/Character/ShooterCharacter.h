@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/PlayerInterface.h"
+#include "ShooterTypes/ShooterTypes.h"
 #include "ShooterCharacter.generated.h"
 
 struct FGameplayTag;
@@ -39,6 +40,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="FPS|FABRIK")
 	FTransform FABRIK_SocketTransform;
 	
+	UFUNCTION(BlueprintCallable, Category="FPS|FABRIK")
+	bool HasCurrentWeapon() const; 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
 	TObjectPtr<UCombatComponent> CombatComponent;
@@ -48,6 +51,15 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Camera")
 	float DefaultFOV;
+	
+	UPROPERTY(BlueprintReadOnly, Category="FPS|TurnInPlace")
+	float AO_Yaw;
+	
+	UPROPERTY(BlueprintReadOnly, Category="FPS|Strafing")
+	float MovementOffsetYaw;
+	
+	UPROPERTY(BlueprintReadOnly, Category="FPS|TurnInPlace")
+	ETurningInPlace TurningStatus;
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAim(bool bIsAiming);
@@ -61,6 +73,11 @@ private:
 	void Input_AimWeapon_Released();
 	
 	void CalculateFABRIKSocketTransform();
+	void CalculateTurnInPlaceParameters(float DeltaTime);
+	void TurnInPlace(float DeltaTime);
+	
+	FRotator StartingAimRotation;
+	float InterpAO_Yaw;
 
 	// 1st person view (arms)
 	UPROPERTY(VisibleAnywhere)

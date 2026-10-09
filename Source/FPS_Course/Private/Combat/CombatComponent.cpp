@@ -10,7 +10,7 @@
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
+	TraceLength = 20000.f;
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
@@ -47,6 +47,7 @@ void UCombatComponent::Initiate_FireWeapon_Pressed()
 
 void UCombatComponent::Local_FireWeapon()
 {
+	if (!IsValid(CurrentWeapon)) return;
 	ensure(IsValid(WeaponData));
 	
 	UAnimMontage* Montage1P = WeaponData->FirstPersonMontages.FindChecked(CurrentWeapon->WeaponType).FireMontage;
@@ -57,16 +58,22 @@ void UCombatComponent::Local_FireWeapon()
 		Mesh1P->GetAnimInstance()->Montage_Play(Montage1P);
 	}
 	
-	Server_FireWeapon();
+	FHitResult Hit;
+	CurrentWeapon->WeaponTrace(Hit, TraceLength);
+	
+	EPhysicalSurface ImpactSurfaceType = Hit.PhysMaterial.IsValid(false) ? Hit.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType1;
+	CurrentWeapon->Local_Fire(Hit.ImpactPoint, Hit.ImpactNormal, ImpactSurfaceType, true);
+	
+	Server_FireWeapon(Hit);
 }
 
-void UCombatComponent::Server_FireWeapon_Implementation()
+void UCombatComponent::Server_FireWeapon_Implementation(const FHitResult& Hit)
 {
-	Multicast_FireWeapon();
+	Multicast_FireWeapon(Hit);
 }
 
 
-void UCombatComponent::Multicast_FireWeapon_Implementation()
+void UCombatComponent::Multicast_FireWeapon_Implementation(const FHitResult& Hit)
 {
 	APawn* OwningPawn = Cast<APawn>(GetOwner());
 	if (OwningPawn->IsLocallyControlled())
@@ -79,6 +86,9 @@ void UCombatComponent::Multicast_FireWeapon_Implementation()
 		UAnimMontage* Montage3P = WeaponData->ThirdPersonMontages.FindChecked(CurrentWeapon->WeaponType).FireMontage;
 		USkeletalMeshComponent* Mesh3P = IPlayerInterface::Execute_GetMesh3P(CurrentWeapon->GetOwner());
 	
+		EPhysicalSurface ImpactSurfaceType = Hit.PhysMaterial.IsValid(false) ? Hit.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType1;
+		CurrentWeapon->Local_Fire(Hit.ImpactPoint, Hit.ImpactNormal, ImpactSurfaceType, true);
+		
 		if (IsValid(Montage3P) && IsValid(Mesh3P))
 		{
 			Mesh3P->GetAnimInstance()->Montage_Play(Montage3P);

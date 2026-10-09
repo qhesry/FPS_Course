@@ -20,6 +20,7 @@ public:
 	USkeletalMeshComponent* GetMesh3P() const { return Mesh3P; }
 	
 	void AttachToOwningPawn() const;
+	void WeaponTrace(FHitResult& OutHitResult, float TraceLength);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="FPS|WeaponType")
 	FGameplayTag WeaponType;
@@ -27,8 +28,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Aiming")
 	float AimFOV;
 	
-protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Aiming")
+	float TraceRadius;
 	
+	void Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> ImpactSurfaceType, bool bIsFirstPerson);
+	
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void FireEffects(const FVector& ImpactPoint, const FVector& ImpactNormal, EPhysicalSurface ImpactSurfaceType, bool bIsFirstPerson);
 	
 private:
 	UPROPERTY(VisibleAnywhere)

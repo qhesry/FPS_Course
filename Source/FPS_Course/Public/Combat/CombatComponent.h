@@ -40,6 +40,8 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly ,ReplicatedUsing=OnRep_CurrentWeapon)
 	TObjectPtr<AWeapon> CurrentWeapon;
 protected:
+	UPROPERTY(EditDefaultsOnly, Category="FPS|Weapons")
+	float TraceLength;
 	
 private:
 	UFUNCTION()
@@ -57,7 +59,7 @@ private:
 	void Server_Aim(bool bPressed);
 		
 	UFUNCTION(Server, Reliable)
-	void Server_FireWeapon();
+	void Server_FireWeapon(const FHitResult& Hit);
 	
 	UFUNCTION()
 	void Local_Aim(bool bPressed);
@@ -66,5 +68,5 @@ private:
 	void Local_FireWeapon();
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_FireWeapon();
+	void Multicast_FireWeapon(const FHitResult& Hit);
 };

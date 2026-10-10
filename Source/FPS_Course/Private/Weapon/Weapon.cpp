@@ -30,6 +30,11 @@ AWeapon::AWeapon()
 	AimFOV = 65.f;
 	TraceRadius = 5.0f;
 	FireTime = 0.1f;
+	
+	MagCapacity = 10;
+	Ammo = 5;
+	StartingCarriedAmmo = 10;
+	Sequence = 0;
 }
 
 void AWeapon::OnRep_Instigator()
@@ -37,6 +42,24 @@ void AWeapon::OnRep_Instigator()
 	Super::OnRep_Instigator();
 	
 	AttachToOwningPawn();
+}
+
+UMaterialInstanceDynamic* AWeapon::GetReticleDynamicMaterialInstance()
+{
+	if (!IsValid(DynMatInst_Reticle))
+	{
+		DynMatInst_Reticle = UMaterialInstanceDynamic::Create(ReticleMaterial, this);
+	}
+	return DynMatInst_Reticle;
+}
+
+UMaterialInstanceDynamic* AWeapon::GetAmmoCounterDynamicMaterialInstance()
+{
+	if (!IsValid(DynMatInst_AmmoCounter))
+	{
+		DynMatInst_AmmoCounter = UMaterialInstanceDynamic::Create(AmmoCounterMaterial, this);
+	}
+	return DynMatInst_AmmoCounter;
 }
 
 void AWeapon::AttachToOwningPawn() const
@@ -94,24 +117,33 @@ void AWeapon::WeaponTrace(FHitResult& OutHitResult, float TraceLength)
 		{
 			OutHitResult.ImpactPoint = TraceEnd;
 		}
-		
-		// DrawDebugSphereTraceSingle(
-		// 	GetWorld(),
-		// 	TraceStart,
-		// 	TraceEnd,
-		// 	TraceRadius,
-		// 	EDrawDebugTrace::ForDuration,
-		// 	bHit,
-		// 	OutHitResult,
-		// 	FColor::Green,
-		// 	FColor::Red,
-		// 	5.0f);
 	}
 }
 
 void AWeapon::Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> ImpactSurfaceType, bool bIsFirstPerson)
 {
 	FireEffects(ImpactPoint, ImpactNormal, ImpactSurfaceType, bIsFirstPerson);
+	
+	if (GetInstigator()->IsLocallyControlled())
+	{
+		Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
+		++Sequence;
+	}
+}
+
+void AWeapon::Auth_Fire()
+{
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
+}
+
+void AWeapon::Rep_Fire(int32 AuthAmmo)
+{
+	if (GetInstigator()->IsLocallyControlled())
+	{
+		Ammo = AuthAmmo;
+		--Sequence;
+		Ammo -= Sequence;
+	}
 }
 
 void AWeapon::SetMeshVisibilities(APawn* OwningPawn) const

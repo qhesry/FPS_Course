@@ -14,6 +14,8 @@ class UCombatComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponFirstReplicated, AWeapon*, Weapon);
+
 UCLASS()
 class FPS_COURSE_API AShooterCharacter : public ACharacter, public IPlayerInterface
 {
@@ -32,6 +34,8 @@ public:
 	virtual FName GetWeaponAttachPoint_Implementation(const FGameplayTag& WeaponTag) override;
 	virtual USkeletalMeshComponent* GetMesh1P_Implementation() const override;
 	virtual USkeletalMeshComponent* GetMesh3P_Implementation() const override;
+	virtual void WeaponReplicated_Implementation() override;
+	virtual AWeapon* GetCurrentWeapon_Implementation() override;
 	/** ~Player Interface */
 	
 	UFUNCTION(BlueprintCallable)
@@ -42,6 +46,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="FPS|FABRIK")
 	bool HasCurrentWeapon() const; 
+	
+	UPROPERTY(BlueprintAssignable)
+	FWeaponFirstReplicated OnWeaponFirstReplicated;
+
+	bool HasWeaponFirstReplicated() const { return bWeaponFirstReplicated; }
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
 	TObjectPtr<UCombatComponent> CombatComponent;
@@ -76,6 +85,7 @@ private:
 	void CalculateTurnInPlaceParameters(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
 	
+	bool bWeaponFirstReplicated;
 	FRotator StartingAimRotation;
 	float InterpAO_Yaw;
 

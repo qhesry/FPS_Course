@@ -29,6 +29,7 @@ AWeapon::AWeapon()
 	
 	AimFOV = 65.f;
 	TraceRadius = 5.0f;
+	FireTime = 0.1f;
 }
 
 void AWeapon::OnRep_Instigator()
@@ -81,13 +82,18 @@ void AWeapon::WeaponTrace(FHitResult& OutHitResult, float TraceLength)
 		const bool bHit = GetWorld()->SweepSingleByChannel(
 			OutHitResult, 
 			TraceStart, 
-			TraceEnd, 
+			TraceEnd,
 			FQuat::Identity, 
 			FPSTraceChannels::ECC_Weapon, 
 			FCollisionShape::MakeSphere(TraceRadius), 
 			Params,
 			ResponseParams
 		);
+		
+		if (!bHit)
+		{
+			OutHitResult.ImpactPoint = TraceEnd;
+		}
 		
 		// DrawDebugSphereTraceSingle(
 		// 	GetWorld(),

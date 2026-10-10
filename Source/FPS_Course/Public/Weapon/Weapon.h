@@ -7,6 +7,13 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+UENUM(BlueprintType)
+enum class EFireType : uint8
+{
+	Auto UMETA(DisplayName="Automatic"),
+	SemiAuto UMETA(DisplayName="Semi-Automatic")
+};
+
 UCLASS()
 class FPS_COURSE_API AWeapon : public AActor
 {
@@ -31,18 +38,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Aiming")
 	float TraceRadius;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="FPS|Aiming")
+	EFireType FireType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="FPS|Aiming")
+	float FireTime;
+	
 	void Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> ImpactSurfaceType, bool bIsFirstPerson);
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void FireEffects(const FVector& ImpactPoint, const FVector& ImpactNormal, EPhysicalSurface ImpactSurfaceType, bool bIsFirstPerson);
 	
-private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Mesh1P;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Mesh3P;
+	
+private:
 	
 	void SetMeshVisibilities(APawn* OwningPawn) const;
 };

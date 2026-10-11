@@ -76,6 +76,16 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	CalculateFABRIKSocketTransform();
 }
 
+void AShooterCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	if (IsValid(CombatComponent))
+	{
+		CombatComponent->InitializeWeaponWidgets();
+	}
+}
+
 void AShooterCharacter::CalculateTurnInPlaceParameters(float DeltaTime)
 {
 	FVector Velocity = GetVelocity();

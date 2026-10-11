@@ -34,7 +34,7 @@ void UCombatComponent::OnRep_CurrentWeapon(AWeapon* LastWeapon)
 {
 	if (!IsValid(CurrentWeapon)) return;
 	CurrentWeapon->AttachToOwningPawn();
-	IPlayerInterface::Execute_WeaponReplicated(CurrentWeapon->GetOwner());
+	IPlayerInterface::Execute_WeaponReplicated(GetOwner());
 	InitializeWeaponWidgets();
 }
 

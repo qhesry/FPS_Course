@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/PlayerInterface.h"
 #include "ShooterTypes/ShooterTypes.h"
+#include "Weapon/Weapon.h"
 #include "ShooterCharacter.generated.h"
 
 struct FGameplayTag;
@@ -28,6 +29,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void OnRep_PlayerState() override;
+	
 	
 	virtual void PossessedBy(AController* NewController) override;
 	/** Player Interface */

@@ -45,7 +45,7 @@ void UShooterReticle::NativeOnInitialized()
 		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
 		if (IsValid(Weapon))
 		{
-			OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams);
+			OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
 			OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);	
 		}
 	}
@@ -58,7 +58,7 @@ void UShooterReticle::NativeOnInitialized()
 	{
 		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
 		if (!IsValid(Weapon)) return;
-		OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams);
+		OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
 		OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);	
 	}
 }
@@ -111,11 +111,11 @@ void UShooterReticle::OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 
 void UShooterReticle::OnWeaponFirstReplicated(AWeapon* Weapon)
 {
-	OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams);
+	OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
 	OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);
 }
 
-void UShooterReticle::OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst, const FReticleParams& ReticleParams)
+void UShooterReticle::OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst, const FReticleParams& ReticleParams, bool bTargeting)
 {
 	CurrentReticleParams = ReticleParams;
 	CurrentReticle_DynMatInst = ReticleDynMatInst;
@@ -126,6 +126,8 @@ void UShooterReticle::OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatIn
 	{
 		Image_Reticle->SetBrush(Brush);
 	}
+	
+	OnTargetingPlayerStatusChanged(false);
 }
 
 void UShooterReticle::OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounterDynMatInst, int32 RoundsCurrent, int32 RoundsMax)

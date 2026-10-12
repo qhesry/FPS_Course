@@ -46,7 +46,7 @@ private:
 	void OnWeaponFirstReplicated(AWeapon* Weapon);
 	
 	UFUNCTION()
-	void OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst, const FReticleParams& ReticleParams);
+	void OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst, const FReticleParams& ReticleParams, bool bTargeting);
 	
 	UFUNCTION()
 	void OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounterDynMatInst, int32 RoundsCurrent, int32 RoundsMax);

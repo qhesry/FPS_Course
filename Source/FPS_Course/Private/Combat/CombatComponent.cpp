@@ -65,6 +65,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 	DOREPLIFETIME(ThisClass, Inventory);
 	DOREPLIFETIME(ThisClass, CurrentWeapon);
 	DOREPLIFETIME_CONDITION(ThisClass, bAiming, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentReserveAmmo, COND_OwnerOnly);
 }
 
 void UCombatComponent::OnRep_CurrentWeapon(AWeapon* LastWeapon)
@@ -110,7 +111,7 @@ void UCombatComponent::Local_FireWeapon()
 	
 	EPhysicalSurface ImpactSurfaceType = Hit.PhysMaterial.IsValid(false) ? Hit.PhysMaterial->SurfaceType.GetValue() : EPhysicalSurface::SurfaceType1;
 	CurrentWeapon->Local_Fire(Hit.ImpactPoint, Hit.ImpactNormal, ImpactSurfaceType, true);
-	OnRoundFired.Broadcast(CurrentWeapon->Ammo, CurrentWeapon->MagCapacity);
+	OnRoundFired.Broadcast(CurrentWeapon->Ammo, CurrentWeapon->MagCapacity, CurrentReserveAmmo);
 	
 	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerFinished, CurrentWeapon->FireTime);
 	
@@ -193,6 +194,13 @@ void UCombatComponent::Server_Aim_Implementation(bool bPressed)
 	Local_Aim(bPressed);
 }
 
+void UCombatComponent::OnRep_CurrentReserveAmmo()
+{
+	if (!IsValid(CurrentWeapon)) return;
+	
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo, CurrentWeapon->Ammo, CurrentWeapon->WeaponIcon);
+}
+
 void UCombatComponent::Local_Aim(bool bPressed)
 {
 	bAiming = bPressed;
@@ -207,6 +215,7 @@ void UCombatComponent::SpawnInventory()
 	{
 		AWeapon* NewWeapon = SpawnWeapon(WeaponClass);
 		Inventory.Add(NewWeapon);
+		ReserveAmmo.Add(NewWeapon->WeaponType, NewWeapon->StartingCarriedAmmo);
 	}
 	
 	if (Inventory.Num() > 0)
@@ -220,6 +229,9 @@ void UCombatComponent::EquipWeapon(AWeapon* Weapon)
 {
 	CurrentWeapon = Weapon;
 	CurrentWeapon->AttachToOwningPawn();
+	
+	CurrentReserveAmmo = ReserveAmmo.FindChecked(Weapon->WeaponType);
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo, Weapon->Ammo, Weapon->WeaponIcon);
 }
 
 void UCombatComponent::DestroyInventory()

@@ -15,7 +15,7 @@ class UCombatComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponFirstReplicated, AWeapon*, Weapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FWeaponFirstReplicated, AWeapon*, Weapon, bool, bHitPlayer);
 
 UCLASS()
 class FPS_COURSE_API AShooterCharacter : public ACharacter, public IPlayerInterface
@@ -39,6 +39,7 @@ public:
 	virtual USkeletalMeshComponent* GetMesh3P_Implementation() const override;
 	virtual void WeaponReplicated_Implementation() override;
 	virtual AWeapon* GetCurrentWeapon_Implementation() override;
+	virtual int32 GetReserveAmmo_Implementation() override;
 	/** ~Player Interface */
 	
 	UFUNCTION(BlueprintCallable)

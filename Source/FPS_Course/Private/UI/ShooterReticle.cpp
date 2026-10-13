@@ -37,6 +37,8 @@ void UShooterReticle::NativeOnInitialized()
 	
 	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetOwningPlayerPawn());
 	if (!IsValid(ShooterCharacter)) return;
+	UCombatComponent* CombatComponent = UCombatComponent::FindCombatComponent(ShooterCharacter);
+	if (!IsValid(CombatComponent)) return;
 	
 	OnPossessedPawnChanged(nullptr, ShooterCharacter);
 	
@@ -45,7 +47,7 @@ void UShooterReticle::NativeOnInitialized()
 		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
 		if (IsValid(Weapon))
 		{
-			OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
+			OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, CombatComponent->bHitPlayer);
 			OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);	
 		}
 	}
@@ -58,6 +60,7 @@ void UShooterReticle::NativeOnInitialized()
 	{
 		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
 		if (!IsValid(Weapon)) return;
+		
 		OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
 		OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);	
 	}
@@ -109,9 +112,9 @@ void UShooterReticle::OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 	}
 }
 
-void UShooterReticle::OnWeaponFirstReplicated(AWeapon* Weapon)
+void UShooterReticle::OnWeaponFirstReplicated(AWeapon* Weapon, bool bHitPlayer)
 {
-	OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bTargetingPlayer);
+	OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance(), Weapon->ReticleParams, bHitPlayer);
 	OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);
 }
 
@@ -145,7 +148,7 @@ void UShooterReticle::OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounter
 	}
 }
 
-void UShooterReticle::OnRoundFired(int32 RoundsCurrent, int32 RoundsMax)
+void UShooterReticle::OnRoundFired(int32 RoundsCurrent, int32 RoundsMax, int32 RoundsInReserve)
 {
 	_BaseCornerScaleFactor_RoundFired += CurrentReticleParams.ScaleFactor_RoundFired;
 	_BaseShapeCutFactor_RoundFired += CurrentReticleParams.ShapeCutFactor_RoundFired;

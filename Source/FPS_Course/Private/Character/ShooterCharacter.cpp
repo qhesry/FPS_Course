@@ -196,13 +196,18 @@ void AShooterCharacter::WeaponReplicated_Implementation()
 	if (!bWeaponFirstReplicated)
 	{
 		bWeaponFirstReplicated = true;
-		OnWeaponFirstReplicated.Broadcast(CombatComponent->CurrentWeapon);
+		OnWeaponFirstReplicated.Broadcast(CombatComponent->CurrentWeapon, CombatComponent->bHitPlayer);
 	}
 }
 
 AWeapon* AShooterCharacter::GetCurrentWeapon_Implementation()
 {
 	return CombatComponent->CurrentWeapon;
+}
+
+int32 AShooterCharacter::GetReserveAmmo_Implementation()
+{
+	return CombatComponent->CurrentReserveAmmo;
 }
 
 FRotator AShooterCharacter::GetFixedAimRotation() const

@@ -51,6 +51,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="FPS|Reticle")
 	FReticleParams ReticleParams;
 	
+	UPROPERTY(EditDefaultsOnly, Category="FPS|Weapon")
+	TObjectPtr<UMaterialInterface> WeaponIcon;
+	
 	void Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> ImpactSurfaceType, bool bIsFirstPerson);
 	void Auth_Fire();
 	void Rep_Fire(int32 AuthAmmo);

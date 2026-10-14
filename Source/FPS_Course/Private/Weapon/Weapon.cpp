@@ -35,13 +35,7 @@ AWeapon::AWeapon()
 	Ammo = 5;
 	StartingCarriedAmmo = 10;
 	Sequence = 0;
-}
-
-void AWeapon::OnRep_Instigator()
-{
-	Super::OnRep_Instigator();
-	
-	AttachToOwningPawn();
+	WeaponStatus = EWeaponStatus::Idle;
 }
 
 UMaterialInstanceDynamic* AWeapon::GetReticleDynamicMaterialInstance()
@@ -62,9 +56,8 @@ UMaterialInstanceDynamic* AWeapon::GetAmmoCounterDynamicMaterialInstance()
 	return DynMatInst_AmmoCounter;
 }
 
-void AWeapon::AttachToOwningPawn() const
+void AWeapon::AttachToOwningPawn(APawn* OwningPawn) const
 {
-	APawn* OwningPawn = GetInstigator();
 	if (!IsValid(OwningPawn) || !OwningPawn->Implements<UPlayerInterface>()) return;
 	
 	SetMeshVisibilities(OwningPawn);
@@ -75,6 +68,17 @@ void AWeapon::AttachToOwningPawn() const
 	
 	Mesh1P->AttachToComponent(PawnMesh1P, FAttachmentTransformRules::KeepRelativeTransform, AttachPoint);
 	Mesh3P->AttachToComponent(PawnMesh3P, FAttachmentTransformRules::KeepRelativeTransform, AttachPoint);
+}
+
+void AWeapon::DetachFromOwningPawn() const
+{
+	// KeepRelative: the relative transform must stay the socket offset, otherwise re-attaching
+	// with KeepRelativeTransform would reuse the old *world* transform as the offset.
+	Mesh1P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	Mesh1P->SetHiddenInGame(true);
+
+	Mesh3P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	Mesh3P->SetHiddenInGame(true);
 }
 
 void AWeapon::WeaponTrace(FHitResult& OutHitResult, float TraceLength)

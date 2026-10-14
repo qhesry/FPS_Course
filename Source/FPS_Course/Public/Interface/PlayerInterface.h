@@ -39,4 +39,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetReserveAmmo();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void NotifyCycleWeapon();
 };

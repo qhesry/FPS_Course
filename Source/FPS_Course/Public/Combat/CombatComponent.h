@@ -39,6 +39,8 @@ public:
 	void Initiate_Aim_Released();
 	
 	void NotifyCycleWeapon();
+	void NotifyReloadWeapon();
+	void AddAmmo(const FGameplayTag& WeaponType, int32 AmmoAmount);
 	
 	UPROPERTY(BlueprintAssignable)
 	FReticleChanged OnReticleChanged;
@@ -82,6 +84,7 @@ public:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentReserveAmmo)
 	int32 CurrentReserveAmmo;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="FPS|Weapons")
 	float TraceLength;
@@ -121,6 +124,9 @@ private:
 	UFUNCTION(Server, Reliable)
 	void Server_CycleWeapon(int32 WeaponIndex);
 	
+	UFUNCTION(Server, Reliable)
+	void Server_ReloadWeapon();
+	
 	UFUNCTION()
 	void OnRep_CurrentReserveAmmo();
 	
@@ -133,9 +139,18 @@ private:
 	UFUNCTION()
 	void Local_CycleWeapon(int32 WeaponIndex);
 	
+	UFUNCTION()
+	void Local_ReloadWeapon();
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_FireWeapon(const FHitResult& Hit, int32 AuthAmmo);
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_CycleWeapon(int32 WeaponIndex);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ReloadWeapon();
+	
+	UFUNCTION(Client, Reliable)
+	void Client_ReloadWeapon(int32 NewWeaponAmmo, int32 NewCarriedAmmo);
 };

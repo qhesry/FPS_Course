@@ -42,4 +42,11 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void NotifyCycleWeapon();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void NotifyReloadWeapon();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddAmmo(const FGameplayTag& WeaponType, int32 AmmoAmount);
+	
 };

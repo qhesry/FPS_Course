@@ -294,10 +294,15 @@ void UCombatComponent::FireTimerFinished()
 void UCombatComponent::Server_FireWeapon_Implementation(const FHitResult& Hit)
 {
 	if (!IsValid(CurrentWeapon)) return;
-
+	if (CurrentWeapon->Ammo <= 0) return;
+	
+	if (IsValid(Hit.GetActor()) && Hit.GetActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_DoDamage(Hit.GetActor(), CurrentWeapon->Damage, GetOwner());
+	}
+	
 	if (!Cast<APawn>(GetOwner())->IsLocallyControlled())
 	{
-		if (CurrentWeapon->Ammo <= 0) return;
 		CurrentWeapon->Auth_Fire();
 	}
 	

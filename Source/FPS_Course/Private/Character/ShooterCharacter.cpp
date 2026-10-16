@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Combat/CombatComponent.h"
+#include "Combat/HealthComponent.h"
 #include "Data/WeaponData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -44,6 +45,9 @@ AShooterCharacter::AShooterCharacter()
 	
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+	
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->SetIsReplicated(true);
 	
 	DefaultFOV = 90.f;
 	TurningStatus = ETurningInPlace::NotTurning;
@@ -227,6 +231,30 @@ void AShooterCharacter::AddAmmo_Implementation(const FGameplayTag& WeaponType, i
 		CombatComponent->AddAmmo(WeaponType, AmmoAmount);	
 	}
 }
+
+bool AShooterCharacter::DoDamage_Implementation(float DamageAmount, AActor* DamageInstigator)
+{
+	if (!IsValid(HealthComponent)) return false;
+	
+	HealthComponent->ChangeHealthByAmount(-DamageAmount, DamageInstigator);
+	const int32 MontageSelection = FMath::RandRange(0, HitReacts.Num() - 1);
+	
+	Multicast_HitReact_Implementation(MontageSelection);
+	
+	return false;
+}
+
+void AShooterCharacter::Multicast_HitReact_Implementation(int32 MontageIndex)
+{
+	if (GetNetMode() != NM_DedicatedServer && !IsLocallyControlled())
+	{
+		if (HitReacts.IsValidIndex(MontageIndex))
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(HitReacts[MontageIndex]);
+		}
+	}
+}
+
 
 FRotator AShooterCharacter::GetFixedAimRotation() const
 {

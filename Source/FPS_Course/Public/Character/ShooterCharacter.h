@@ -9,6 +9,7 @@
 #include "Weapon/Weapon.h"
 #include "ShooterCharacter.generated.h"
 
+class UHealthComponent;
 struct FGameplayTag;
 class UInputAction;
 class UCombatComponent;
@@ -43,6 +44,7 @@ public:
 	virtual void NotifyCycleWeapon_Implementation() override;
 	virtual void NotifyReloadWeapon_Implementation() override;
 	virtual void AddAmmo_Implementation(const FGameplayTag& WeaponType, int32 AmmoAmount) override;
+	virtual bool DoDamage_Implementation(float DamageAmount, AActor* DamageInstigator) override;
 	/** ~Player Interface */
 	
 	UFUNCTION(BlueprintCallable)
@@ -58,9 +60,15 @@ public:
 	FWeaponFirstReplicated OnWeaponFirstReplicated;
 
 	bool HasWeaponFirstReplicated() const { return bWeaponFirstReplicated; }
+	
+	UPROPERTY(EditDefaultsOnly, Category="FPS|HitReact")
+	TArray<TObjectPtr<UAnimMontage>> HitReacts;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Combat");
 	TObjectPtr<UCombatComponent> CombatComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Health")
+	TObjectPtr<UHealthComponent> HealthComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="FPS|Camera")
 	TObjectPtr<UCameraComponent> FirstPersonCamera;
@@ -80,6 +88,8 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAim(bool bIsAiming);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_HitReact(int32 MontageIndex);
 private:
 	void Input_CycleWeapon();
 	void Input_ReloadWeapon();

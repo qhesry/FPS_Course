@@ -87,7 +87,13 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAim(bool bIsAiming);
-
+	
+	UFUNCTION()
+	void OnDeathStarted();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void DeathEffects();
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_HitReact(int32 MontageIndex);
 private:

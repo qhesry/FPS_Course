@@ -7,10 +7,13 @@
 #include "Camera/CameraComponent.h"
 #include "Combat/CombatComponent.h"
 #include "Combat/HealthComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Data/WeaponData.h"
+#include "FPS_Course/FPS_Course.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/ShooterPlayerController.h"
 #include "Weapon/Weapon.h"
 
 AShooterCharacter::AShooterCharacter()
@@ -58,8 +61,16 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	HealthComponent->OnDeathStarted.AddDynamic(this, &ThisClass::OnDeathStarted);
+	
 	FirstPersonCamera->FieldOfView = DefaultFOV;
 	StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+	
+	
+	if (AShooterPlayerController* PlayerController = Cast<AShooterPlayerController>(GetController()); IsValid(PlayerController))
+	{
+		PlayerController->bPawnAlive = true;
+	}
 }
 
 void AShooterCharacter::BeginDestroy()
@@ -289,6 +300,27 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	ShooterInputComponent->BindAction(AimWeaponAction, ETriggerEvent::Started, this, &ThisClass::Input_AimWeapon_Pressed);
 	ShooterInputComponent->BindAction(AimWeaponAction, ETriggerEvent::Completed, this, &ThisClass::Input_AimWeapon_Released);
 	
+}
+
+void AShooterCharacter::OnDeathStarted()
+{
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		DeathEffects();
+		
+		if (AShooterPlayerController* PlayerController = Cast<AShooterPlayerController>(GetController()); IsValid(PlayerController))
+		{
+			DisableInput(PlayerController);
+			if (PlayerController->IsLocalController())
+			{
+				PlayerController->bPawnAlive = false;
+			}
+		}
+	}
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(FPSTraceChannels::ECC_Weapon, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(FPSTraceChannels::ECC_Weapon, ECR_Ignore);
 }
 
 void AShooterCharacter::Input_CycleWeapon()
